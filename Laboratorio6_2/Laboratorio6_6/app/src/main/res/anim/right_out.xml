@@ -1,0 +1,7 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<translate xmlns:android="http:·…"
+    android:duration="500"
+    android:fromxdelta="0"
+    android:toxdelta="100%p"
+    android:interpolator="@android:anim/linear_interpolator">
+</translate>

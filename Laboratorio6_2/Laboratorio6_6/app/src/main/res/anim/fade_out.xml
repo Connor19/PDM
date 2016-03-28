@@ -1,0 +1,8 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<alpha xmlns:android="http:·…"
+    android:duration="800"
+    android:fromalpha="1.0"
+    android:interpolator="@android:anim/accelerate_interpolator"
+    android:repeatcount="0"
+    android:toalpha="0.0">
+</alpha>

@@ -1,0 +1,8 @@
+<objectAnimator xmlns:android="http://schemas.android.com..."
+    android:duration="1000"
+    android:valueFrom="1"
+    android:valueTo="0.5"
+    android:valueType="floatType"
+    android:propertyName="scaleX"
+    android:repeatCount="1"
+    android:repeatMode="reverse"/>

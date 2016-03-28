@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Laboratorio6_6</string>
+    <string name="MainActivity">Primera Actividad</string>
+    <string name="SecondActivity">Segunda Actividad</string>
+</resources>
