@@ -1,0 +1,27 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.manwest.laboratorio6.MainActivity" >
+    <item android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item android:id="@+id/action_back"
+        android:title="@string/action_back"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item android:id="@+id/action_exit"
+        android:title="@string/action_exit"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item android:id="@+id/action_buscar"
+        android:title="@string/action_buscar"
+        android:icon="@drawable/ic_menu_save"
+        android:orderInCategory="100"
+        app:showAsAction="ifRoom"/>
+    <item android:id="@+id/action_nuevo"
+        android:title="@string/action_nuevo"
+        android:icon="@drawable/ic_menu_add"
+        android:orderInCategory="100"
+        app:showAsAction="ifRoom|withText"/>
+</menu>
