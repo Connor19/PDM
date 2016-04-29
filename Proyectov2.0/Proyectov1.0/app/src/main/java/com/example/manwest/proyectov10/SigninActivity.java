@@ -29,6 +29,8 @@ import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
 /**
  * Created by User on 26/04/2016.
  */
+//con esta activity te permitira logearte o no, si te da acceso se muestra un toast de verificacion
+//pero si no te da el acceso, muestra un toast de peticion de ingreso
 public class SigninActivity extends AsyncTask<String, Void, String> {
     private Context context;
     private boolean ingreso;

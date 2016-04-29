@@ -41,24 +41,25 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    private JSONParser jParser = new JSONParser();
-    private JSONParser jParser2 = new JSONParser();
-    private Spinner spTipoBasura;
-    private Spinner spCiudad;
-    private List<String> listaTipoBasura;
-    private List<String> listaCiudad;
-    private List<String> listaCiudad2;
-    private List<Double> listaLat;
-    private List<Double> listaLng;
-    private ProgressDialog pDialog;
-    private Context c= this;
+    private JSONParser jParser = new JSONParser(); //variable usada por la lista de ciudades
+    private JSONParser jParser2 = new JSONParser(); //variable usada por la lista de tipos de basura
+    private Spinner spTipoBasura; //spinner de tipo de basura
+    private Spinner spCiudad; //spinner de ciudad
+    private List<String> listaTipoBasura; //lista de tipo de basura
+    private List<String> listaCiudad; //lista de ciudad que usa mMap
+    private List<String> listaCiudad2; //lista de ciudad que usa usa spCiudad
+    private List<Double> listaLat; //lista de latitudes que usa mMap
+    private List<Double> listaLng; //lista de longitudes que usa mMap
+    private ProgressDialog pDialog; //Progresss dialog usado en cada cambio de estado
+    private Context c= this; //contenedor
+    //direcciones de los php del servidor
     private static String url_get_map = "http://frzasd.esy.es/RecyclingBins/getAllGB.php";
     private static String url_get_map2 = "http://frzasd.esy.es/RecyclingBins/getAllGB2.php";
     private static String url_get_tipo = "http://frzasd.esy.es/RecyclingBins/getTipo.php";
     private static String url_get_tipo2 = "http://frzasd.esy.es/RecyclingBins/getTipo2.php";
     private static String url_update_map = "http://frzasd.esy.es/RecyclingBins/updateMap.php";
     private static String url_update_map2 = "http://frzasd.esy.es/RecyclingBins/updateMap2.php";
-
+    //tags usados por cada estado
     private static final String TAG_SUCCESS = "success";
     private static final String TAG_BASURERO = "basurero";
     private static final String TAG_ID = "id";
@@ -68,10 +69,12 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG_TIPO = "tipo";
     private static final String TAG_TIPOBASURERO = "tipobasurero";
     private static final String TAG_CONSULTA = "consulta";
-    JSONArray nombres = null;
-    JSONArray nombres2 = null;
-    JSONArray tipo = null;
-    JSONArray update = null;
+
+    JSONArray nombres = null; //json usado para actualizar mMap
+    JSONArray nombres2 = null; //json usado para actualizar la lista de ciudades
+    JSONArray tipo = null; //json usado para actualizar la lista de basura
+    JSONArray update = null; //json usado para actualizar mMap
+
     GoogleMap mMap;
     CameraUpdate mCamera;
 
@@ -79,10 +82,10 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        //Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        //Navigation Drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -91,12 +94,14 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
+        //primero se crean y cargan los datos
         Datos();
+        //luego se centra el foco del mMap
         setUpMapIfNeeded();
+        //se hacen verificaciones a los urls
         new UbicationMaps(this).execute();
     }
-
+    //usado por el NavigationView
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -106,14 +111,14 @@ public class MainActivity extends AppCompatActivity
             super.onBackPressed();
         }
     }
-
+    //crea la lista del menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
-
+    //activdades realizadas por cada item del menu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -122,23 +127,27 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
+        //en este caso solo hay 1 item, el cual vuelve a cargar mMap
         if (id == R.id.action_clear) {
+            //primero limpia
             mMap.clear();
             listaLat.clear();
             listaLng.clear();
             listaCiudad.clear();
             listaCiudad2.clear();
+            //luego agrega los titulos de cada lista desplegable
             listaCiudad.add("Distrito");
             listaCiudad2.add("Distrito");
             listaTipoBasura.clear();
             listaTipoBasura.add("Tipo de Basura");
+            //al final vuelve a hacer la consulta al servidor
             new UbicationMaps(c).execute();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
-
+    //opciones del Navigation View, el cual todos llaman a Login
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -174,7 +183,7 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
+    //creando y cargando los datos del servidor en la app
     private void Datos(){
         spTipoBasura = (Spinner) findViewById(R.id.tipoBasura);
         spCiudad = (Spinner) findViewById(R.id.ciudad);
@@ -184,6 +193,7 @@ public class MainActivity extends AppCompatActivity
         listaCiudad2 = new ArrayList<String>();
         listaLat = new ArrayList<Double>();
         listaLng = new ArrayList<Double>();
+        //titulo de la lista Tipo basura
         listaTipoBasura.add("Tipo de Basura");
         //listaTipoBasura.add("Organico");
         //listaTipoBasura.add("Latas Metal");
@@ -191,6 +201,8 @@ public class MainActivity extends AppCompatActivity
         //listaTipoBasura.add("Vidrio");
         //listaTipoBasura.add("Plastico");
         //listaTipoBasura.add("Peligrosos");
+
+        //titulo de la lista de ciudades, la que ira en el mMap y en la lista desplegable
         listaCiudad.add("Distrito");
         listaCiudad2.add("Distrito");
         //listaCiudad.add("Lima");
@@ -205,6 +217,8 @@ public class MainActivity extends AppCompatActivity
         //adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //spCiudad.setAdapter(adapter2);
 
+        //para saber que item se selecciono de la lista desplegable de ciudad,
+        //donde despues de escoger algun item se puede reiniciar volviendo a seleecionar el titulo
         spCiudad.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             boolean go1 = true;
 
@@ -242,6 +256,9 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        //para saber que item se selecciono de la lista desplegable de tipo basura,
+        //donde despues de escoger algun item se puede reiniciar volviendo a seleecionar el titulo
+        //cuando se escoge algun item, se vuelve a cargar la lista, por si se actualiza en algun momento
         spTipoBasura.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             boolean go2 = true;
             @Override
@@ -310,16 +327,9 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
-    private void setUpMap() {
-        //mMap.addMarker(new MarkerOptions().position(new LatLng(-12.017124,-77.050744)).title("Facultad de Ciencias"));
-        //mCamera = CameraUpdateFactory.newLatLngZoom(new LatLng(-12.017124, -77.050744), 0);
-        //mMap.animateCamera(mCamera);
-        //mMap.addMarker(new MarkerOptions().position(new LatLng(-12.017124, -77.050744))
-        //        .title("Facultad de Ciencias")
-        //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
-        //        .icon(BitmapDescriptorFactory.fromResource(R.drawable.cafeteria))
-        //        .snippet("The beast School"));
 
+    private void setUpMap() {
+        //se hace foco a la municipalidad de lima
         mCamera = CameraUpdateFactory.newLatLngZoom(new LatLng(-12.0451952, -77.0321625), 11);
         mMap.animateCamera(mCamera);
     }
@@ -333,6 +343,7 @@ public class MainActivity extends AppCompatActivity
                 .alpha(opacity)
                 .anchor(dimension1, dimension2));
     }
+    //con esta clase se obtendra la ubicacion de todos los centros de reciclados y de las listas despleglables
     public class UbicationMaps extends AsyncTask<String, String, String>{
         Context context;
         public UbicationMaps(Context context){
@@ -352,16 +363,16 @@ public class MainActivity extends AppCompatActivity
             List params = new ArrayList<>();
             List params1 = new ArrayList<>();
             List params2 = new ArrayList<>();
-            JSONObject json = jParser.makeHttpRequest(url_get_map, "POST", params);
-            JSONObject json1 = jParser.makeHttpRequest(url_get_map2, "POST", params1);
-            JSONObject json2 = jParser2.makeHttpRequest(url_get_tipo2, "POST", params2);
+            JSONObject json = jParser.makeHttpRequest(url_get_map, "POST", params);//para mMap
+            JSONObject json1 = jParser.makeHttpRequest(url_get_map2, "POST", params1);//para la lista desplegable
+            JSONObject json2 = jParser2.makeHttpRequest(url_get_tipo2, "POST", params2);//para la lista desplegable
             Log.d("All names: ", json.toString());
             try{
-                int success = json.getInt(TAG_SUCCESS);
-                int success1 = json1.getInt(TAG_SUCCESS);
-                int success2 = json2.getInt(TAG_SUCCESS);
+                int success = json.getInt(TAG_SUCCESS); //para mMap
+                int success1 = json1.getInt(TAG_SUCCESS);//para la lista desplegable
+                int success2 = json2.getInt(TAG_SUCCESS);//para la lista desplegable
+                //para mMap
                 if(success == 1){
-
                     nombres = json.getJSONArray(TAG_BASURERO);
                     for(int i = 0;i < nombres.length();i++){
                         JSONObject c = nombres.getJSONObject(i);
@@ -374,7 +385,7 @@ public class MainActivity extends AppCompatActivity
                         listaLng.add(Double.parseDouble(lng));
                     }
                 }
-
+                //para la lista desplegable
                 if(success1 == 1){
 
                     nombres2 = json1.getJSONArray(TAG_BASURERO);
@@ -384,6 +395,7 @@ public class MainActivity extends AppCompatActivity
                         listaCiudad2.add(name);
                     }
                 }
+                //para la lista desplegable
                 if(success2 == 1){
                     tipo = json2.getJSONArray(TAG_TIPOBASURERO);
                     for(int i = 0; i<tipo.length();i++){
@@ -404,28 +416,30 @@ public class MainActivity extends AppCompatActivity
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    //para la lista desplegable
                     ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, listaTipoBasura);
                     adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spTipoBasura.setAdapter(adapter1);
-
+                    //para la lista desplegable
                     ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, listaCiudad2);
                     adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spCiudad.setAdapter(adapter2);
-
+                    //agreando las coordenadas de los centros en mMap
                     for(int i = 0; i < listaLat.size(); i++){
                         mMap.addMarker(new MarkerOptions().position(new LatLng(listaLat.get(i),listaLng.get(i))).title("Municipalidad de " + listaCiudad.get(i+1)));
                     }
-
-
                 }
             });
         }
     }
-
+    //con esta clase se obtendra la ubicacion los centros de reciclaje dependiendo de la opcion escogida
     public class updateMap extends AsyncTask<String, String, String>{
         Context context;
         String type;
         int flag;
+        //el flag se usa para saber quien esta llamandolo
+        //0 si se escogio algun item de la lista de ciudades
+        //1 si se escogio algun item de la lista de tipos de basura
         public updateMap(Context context, String type, int flag){
             this.context = context;
             this.type = type;
@@ -443,6 +457,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected String doInBackground(String... args){
             List params = new ArrayList<>();
+            //cambia los espacios en blanco por %20
             type = type.replace(" ","%20");
             if(flag == 0){
                 JSONObject json = jParser.makeHttpRequest(url_update_map2+"?nombre="+type, "POST", params);
@@ -498,12 +513,11 @@ public class MainActivity extends AppCompatActivity
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-
+                    //ya no hace falta volver a cargar las listas en los spiiner, la clase anterior se encarga de eso
+                    //vuelve a marcar en mMap
                     for(int i = 0; i < listaLat.size(); i++){
                         mMap.addMarker(new MarkerOptions().position(new LatLng(listaLat.get(i),listaLng.get(i))).title("Municipalidad de " + listaCiudad.get(i+1)));
                     }
-
-
                 }
             });
         }

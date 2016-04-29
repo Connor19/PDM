@@ -16,7 +16,7 @@ public class Login extends AppCompatActivity {
     private Button btnIngresar;
     private Button btnCrear;
     private Button btnRegresar;
-    private boolean ingreso=false;
+    private boolean ingreso=false; //variable del estado del logeo, no usada
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -30,6 +30,7 @@ public class Login extends AppCompatActivity {
         btnRegresar = (Button) findViewById(R.id.btnRegresar);
         asignarEventos();
     }
+    //Asignando los eventos a cada boton
     private void asignarEventos(){
         btnIngresar.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {

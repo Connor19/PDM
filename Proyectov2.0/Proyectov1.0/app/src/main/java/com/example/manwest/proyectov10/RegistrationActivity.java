@@ -24,6 +24,8 @@ import cz.msebera.android.httpclient.impl.client.DefaultHttpClient;
 /**
  * Created by User on 26/04/2016.
  */
+//con esta activity se registraran a los usuarios, cuando registras uno nuevo muestra un toast de verificacion
+//pero cuanod ingresas uno ya existente, por ahora no muestra nada
 public class RegistrationActivity extends AsyncTask<String, Void, String> {
     private Context context;
     private ProgressDialog pDialog;
